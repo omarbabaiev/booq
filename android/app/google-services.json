@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "558257555900",
+    "project_id": "booq-e2f02",
+    "storage_bucket": "booq-e2f02.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:558257555900:android:dff48d9d42e9fabbdec3b9",
+        "android_client_info": {
+          "package_name": "com.example.booq_last_attempt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "558257555900-6fqpp13uhln3h756v1e78op6qjngn0a2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.booq_last_attempt",
+            "certificate_hash": "5ec604b490ed35bb0cf1f5abfea1cb937925cdd9"
+          }
+        },
+        {
+          "client_id": "558257555900-32mr2osqmkt6sr00cep9riql2946qgal.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5fzNlcUapMZZ-Z6XdjxbO7bF1cZjuX3M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "558257555900-32mr2osqmkt6sr00cep9riql2946qgal.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "558257555900-bqo7n616kobse57v5ev633dchptg5m21.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.booqLastAttempt"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
