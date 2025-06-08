@@ -31,8 +31,10 @@ class PostCard extends StatelessWidget {
           TextDirection.ltr, // Or TextDirection.rtl based on language
     );
     tp.layout(
-      maxWidth: MediaQuery.of(context).size.width - 32 - 40,
-    ); // Adjust max width based on padding and avatar
+      maxWidth:
+          MediaQuery.of(context).size.width -
+          32, // Adjust max width based on padding
+    ); // Adjust max width based on padding
 
     if (!tp.didExceedMaxLines) {
       return Text(
@@ -70,12 +72,12 @@ class PostCard extends StatelessWidget {
     AppUser originalPostUser,
   ) {
     return Container(
-      margin: const EdgeInsets.only(top: 8.0),
-      padding: const EdgeInsets.all(12.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0), // Reduced margin
+      padding: const EdgeInsets.all(8.0), // Reduced padding
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Colors.grey[50], // Lighter grey for background
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
+        border: Border.all(color: Colors.grey[200]!), // Lighter border
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,25 +187,18 @@ class PostCard extends StatelessWidget {
     final originalPostUser = postWithUser.originalPostUser;
 
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      padding: EdgeInsets.all(16), // Slightly reduced padding
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8), // Slightly rounded corners
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 16,
-            offset: Offset(0, 8),
-          ),
-        ],
-      ),
+      color:
+          Colors.white, // No rounded corners, no box shadow, just solid color
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Reposted by section
           if (originalPost != null && originalPostUser != null)
             Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -221,220 +216,247 @@ class PostCard extends StatelessWidget {
                     context,
                     originalPost,
                     originalPostUser,
-                  ), // Call new helper widget
+                  ),
                 ],
               ),
             ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              user.photoUrl.isNotEmpty
-                  ? CircleAvatar(
-                    radius: 20, // Slightly smaller avatar
-                    backgroundImage: NetworkImage(user.photoUrl),
-                  )
-                  : CircleAvatar(
-                    radius: 20,
-                    backgroundColor: Color(0xFFE0E0E0),
-                    child: Icon(Icons.person, color: Color(0xFFB8B6F8)),
+          // User Info and More Options
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                user.photoUrl.isNotEmpty
+                    ? CircleAvatar(
+                      radius: 20,
+                      backgroundImage: NetworkImage(user.photoUrl),
+                    )
+                    : CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Color(0xFFE0E0E0),
+                      child: Icon(Icons.person, color: Color(0xFFB8B6F8)),
+                    ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user.name.isNotEmpty ? user.name : 'Anonim',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF3A3A5A),
+                        ),
+                      ),
+                      Text(
+                        user.username != null && user.username!.isNotEmpty
+                            ? '@${user.username!}'
+                            : 'Username yoxdur',
+                        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                      ),
+                    ],
                   ),
-              SizedBox(width: 12), // Space between avatar and text
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      user.name.isNotEmpty ? user.name : 'Anonim',
-                      style: TextStyle(
-                        fontSize: 15, // Slightly smaller font size
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF3A3A5A),
-                      ),
-                    ),
-                    Text(
-                      user.username != null && user.username!.isNotEmpty
-                          ? '@${user.username!}'
-                          : 'Username yoxdur',
-                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                    ),
-                  ],
                 ),
-              ),
-              PopupMenuButton<String>(
-                onSelected: (String result) {
-                  if (result == 'delete') {
-                    Get.defaultDialog(
-                      title: 'Postu Sil',
-                      middleText:
-                          'Bu postu silmək istədiyinizə əminsinizmi? Bu əməliyyat geri alına bilməz.',
-                      textConfirm: 'Sil',
-                      textCancel: 'Ləğv Et',
-                      confirmTextColor: Colors.white,
-                      buttonColor: Colors.redAccent,
-                      onConfirm: () async {
-                        Get.back();
-                        await postController.deletePost(
-                          post.id,
-                          post.userUid,
-                          post.imageUrls,
-                        );
-                      },
-                    );
-                  } else if (result == 'report') {
-                    Get.snackbar('Şikayət Edildi', 'Göndəri şikayət edildi.');
-                  }
-                },
-                itemBuilder: (BuildContext context) {
-                  if (currentUserId == post.userUid) {
-                    return <PopupMenuEntry<String>>[
-                      const PopupMenuItem<String>(
-                        value: 'delete',
-                        child: Text('Göndərini Sil'),
-                      ),
-                    ];
-                  } else {
-                    return <PopupMenuEntry<String>>[
-                      const PopupMenuItem<String>(
-                        value: 'report',
-                        child: Text('Göndərini Şikayət Et'),
-                      ),
-                    ];
-                  }
-                },
-                icon: const Icon(Icons.more_vert, color: Colors.grey),
-              ),
-            ],
+                PopupMenuButton<String>(
+                  onSelected: (String result) {
+                    if (result == 'delete') {
+                      Get.defaultDialog(
+                        title: 'Postu Sil',
+                        middleText:
+                            'Bu postu silmək istədiyinizə əminsinizmi? Bu əməliyyat geri alına bilməz.',
+                        textConfirm: 'Sil',
+                        textCancel: 'Ləğv Et',
+                        confirmTextColor: Colors.white,
+                        buttonColor: Colors.redAccent,
+                        onConfirm: () async {
+                          Get.back();
+                          await postController.deletePost(
+                            post.id,
+                            post.userUid,
+                            post.imageUrls,
+                          );
+                        },
+                      );
+                    } else if (result == 'report') {
+                      Get.snackbar('Şikayət Edildi', 'Göndəri şikayət edildi.');
+                    }
+                  },
+                  itemBuilder: (BuildContext context) {
+                    if (currentUserId == post.userUid) {
+                      return <PopupMenuEntry<String>>[
+                        const PopupMenuItem<String>(
+                          value: 'delete',
+                          child: Text('Göndərini Sil'),
+                        ),
+                      ];
+                    } else {
+                      return <PopupMenuEntry<String>>[
+                        const PopupMenuItem<String>(
+                          value: 'report',
+                          child: Text('Göndərini Şikayət Et'),
+                        ),
+                      ];
+                    }
+                  },
+                  icon: const Icon(Icons.more_vert, color: Colors.grey),
+                ),
+              ],
+            ),
           ),
+          // Post Text
           if (post.text.isNotEmpty && originalPost == null)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
               child: _buildPostText(context, post.text),
             ),
+          // Post Images
           if (post.imageUrls.isNotEmpty && originalPost == null)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: SizedBox(
-                height: 200,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: post.imageUrls.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: InkWell(
-                          onTap: () {
-                            Get.to(
-                              () => ImageViewScreen(
-                                imageUrl: post.imageUrls[index],
-                                heroTag: 'postImage${post.id}$index',
-                              ),
-                            );
-                          },
-                          child: Hero(
-                            tag: 'postImage${post.id}$index',
-                            child: Image.network(
-                              post.imageUrls[index],
-                              fit: BoxFit.cover,
-                              width: MediaQuery.of(context).size.width - 32,
-                              loadingBuilder: (
-                                context,
-                                child,
-                                loadingProgress,
-                              ) {
-                                if (loadingProgress == null) return child;
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    value:
-                                        loadingProgress.expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                loadingProgress
-                                                    .expectedTotalBytes!
-                                            : null,
-                                  ),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  width: MediaQuery.of(context).size.width - 32,
-                                  color: Colors.grey[300],
-                                  child: Icon(Icons.error),
-                                );
-                              },
+            // No padding here for full-width images
+            SizedBox(
+              height: 200,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: post.imageUrls.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(
+                      right: 4.0,
+                    ), // Reduced spacing between images
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(0),
+                      child: InkWell(
+                        onTap: () {
+                          Get.to(
+                            () => ImageViewScreen(
+                              imageUrl: post.imageUrls[index],
+                              heroTag: 'postImage${post.id}$index',
                             ),
+                          );
+                        },
+                        child: Hero(
+                          tag: 'postImage${post.id}$index',
+                          child: Image.network(
+                            post.imageUrls[index],
+                            fit: BoxFit.cover,
+                            width:
+                                MediaQuery.of(context).size.width, // Full width
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  value:
+                                      loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress
+                                                  .cumulativeBytesLoaded /
+                                              loadingProgress
+                                                  .expectedTotalBytes!
+                                          : null,
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: MediaQuery.of(context).size.width,
+                                color: Colors.grey[300],
+                                child: Icon(Icons.error),
+                              );
+                            },
                           ),
                         ),
                       ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          Divider(height: 20, thickness: 1, color: Colors.grey[200]),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      isLiked ? Icons.favorite : Icons.favorite_border,
-                      color: isLiked ? Colors.red : Colors.grey,
                     ),
-                    onPressed: () {
-                      if (currentUserId == null) {
-                        Get.snackbar(
-                          'Xəta',
-                          'Bəyənmək üçün daxil olmalısınız.',
-                        );
-                        return;
-                      }
-                      if (isLiked) {
-                        feedController.likeOrUnlike(post);
-                      } else {
-                        feedController.likeOrUnlike(post);
-                      }
-                    },
-                  ),
-                  Text('${post.likes.length} Bəyənmə'),
-                  SizedBox(width: 16),
-                  IconButton(
-                    icon: Icon(Icons.comment_outlined, color: Colors.grey),
-                    onPressed: onComment,
-                  ),
-                  Text('${post.commentsCount} Şərh'),
-                ],
+                  );
+                },
               ),
-              Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.repeat, color: Colors.grey),
-                    onPressed: () {
-                      if (currentUserId == null) {
-                        Get.snackbar(
-                          'Xəta',
-                          'Repost etmək üçün daxil olmalısınız.',
-                        );
-                        return;
-                      }
-                      feedController.repost(post);
-                    },
-                  ),
-                  Text('${post.reposts} Repost'),
-                ],
-              ),
-            ],
-          ),
+            ),
+          // Action Buttons and Timestamp
           Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Text(
-              formatDate(post.createdAt!),
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            isLiked ? Icons.favorite : Icons.favorite_border,
+                            color: isLiked ? Colors.red : Colors.grey,
+                          ),
+                          onPressed: () {
+                            if (currentUserId == null) {
+                              Get.snackbar(
+                                'Xəta',
+                                'Bəyənmək üçün daxil olmalısınız.',
+                              );
+                              return;
+                            }
+                            if (isLiked) {
+                              feedController.likeOrUnlike(post);
+                            } else {
+                              feedController.likeOrUnlike(post);
+                            }
+                          },
+                        ),
+                        Text('${post.likes.length} Bəyənmə'),
+                        SizedBox(width: 16),
+                        IconButton(
+                          icon: Icon(
+                            Icons.comment_outlined,
+                            color: Colors.grey,
+                          ),
+                          onPressed: onComment,
+                        ),
+                        Text('${post.commentsCount} Şərh'),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.repeat, color: Colors.grey),
+                          onPressed: () {
+                            if (currentUserId == null) {
+                              Get.snackbar(
+                                'Xəta',
+                                'Repost etmək üçün daxil olmalısınız.',
+                              );
+                              return;
+                            }
+                            feedController.repost(post);
+                          },
+                        ),
+                        Text('${post.reposts} Repost'),
+                      ],
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      formatDate(post.createdAt!),
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
+          const SizedBox(
+            height: 10,
+          ), // Add a small vertical space between posts
         ],
       ),
     );
